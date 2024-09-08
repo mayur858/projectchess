@@ -1,40 +1,86 @@
-// ignore_for_file: must_be_immutable
+import 'package:flutter/material.dart';
+import 'package:projectchess/api/data.dart';
+import 'package:projectchess/api/info.dart';
 
-import "package:flutter/material.dart";
+class IntialScreen extends StatefulWidget {
+  final String title;
 
-class IntialScreen extends StatelessWidget {
-  IntialScreen({
-    super.key,
-    required String title,
-  });
-  String title = 'Chess-V';
+  IntialScreen({super.key, required this.title});
+
+  @override
+  State<IntialScreen> createState() => _IntialScreenState();
+}
+
+class _IntialScreenState extends State<IntialScreen> {
+  Lichess? account; // To store the account details
+  bool isLoading = true; // To show loading spinner
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAccountData(); // Fetch data when the screen initializes
+  }
+
+  // Function to fetch account data and update state
+  Future<void> fetchAccountData() async {
+    try {
+      Lichess fetchedAccount = await getAccountDetails(); // Fetch account details
+      setState(() {
+        account = fetchedAccount; // Store fetched account in state
+        isLoading = false; // Stop loading spinner
+      });
+    } catch (err) {
+      print('Error fetching account details: $err');
+      setState(() {
+        isLoading = false; // Stop loading even if there’s an error
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
       ),
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Container(
-            width: width / 2, // Set a width
-            height: height / 4, // Set a height
-            color: Colors.red,
-          ),
-          Container(
-            width: width / 2,
-            height: height / 4,
-            color: Colors.blue,
-          ),
-          Container(
-            width: width / 2,
-            height: height / 4,
-            color: Colors.green,
-          ),
-        ]),
+        child: isLoading
+            ? const CircularProgressIndicator() // Show loading spinner if data is being fetched
+            : account != null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Display Account Details
+                      Text('Username: ${account!.username}', style: const TextStyle(fontSize: 18)),
+                      Text('ID: ${account!.id}', style: const TextStyle(fontSize: 18)),
+
+                      // Other UI Elements
+                      const SizedBox(height: 20),
+                      const Text("Start New Game"),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 9, 219, 44))),
+                        onPressed: () => {},
+                        child: const Text("New Game"),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('Puzzle'),
+                      ElevatedButton(
+                        onPressed: () => {},
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 9, 2, 2))),
+                        child: const Text("Play"),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('Stats'),
+                    ],
+                  )
+                : const Text('Failed to load account details', style: TextStyle(fontSize: 18)),
       ),
     );
   }

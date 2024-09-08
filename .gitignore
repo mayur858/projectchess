@@ -45,3 +45,6 @@ app.*.map.json
 
 #pubspec 
 /pubspec.yaml
+
+#api
+lib/api/keys.dart

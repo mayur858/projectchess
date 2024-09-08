@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       home: IntialScreen(
         title: 'chess-v',
       ),
+      // routes: ,
     );
   }
 }
