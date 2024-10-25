@@ -5,7 +5,7 @@ import 'package:projectchess/api/info.dart';
 class IntialScreen extends StatefulWidget {
   final String title;
 
-  IntialScreen({super.key, required this.title});
+  const IntialScreen({super.key, required this.title});
 
   @override
   State<IntialScreen> createState() => _IntialScreenState();
@@ -13,6 +13,7 @@ class IntialScreen extends StatefulWidget {
 
 class _IntialScreenState extends State<IntialScreen> {
   Lichess? account; // To store the account details
+  Lichess? rating;
   bool isLoading = true; // To show loading spinner
 
   @override
@@ -24,7 +25,8 @@ class _IntialScreenState extends State<IntialScreen> {
   // Function to fetch account data and update state
   Future<void> fetchAccountData() async {
     try {
-      Lichess fetchedAccount = await getAccountDetails(); // Fetch account details
+      Lichess fetchedAccount =
+          await getAccountDetails(); // Fetch account details
       setState(() {
         account = fetchedAccount; // Store fetched account in state
         isLoading = false; // Stop loading spinner
@@ -37,6 +39,21 @@ class _IntialScreenState extends State<IntialScreen> {
     }
   }
 
+  Future<void> fetchRatingData() async {
+    try {
+      Lichess fetchedRating = await getRatingDetails();
+      setState(() {
+        rating = fetchedRating;
+        isLoading = false;
+      });
+    } catch (err) {
+      print('Error fetching rating Details: $err');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -44,26 +61,30 @@ class _IntialScreenState extends State<IntialScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Center(child: Text(widget.title)),
       ),
       body: Center(
         child: isLoading
             ? const CircularProgressIndicator() // Show loading spinner if data is being fetched
-            : account != null
+            : account != null && rating != null
                 ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Display Account Details
-                      Text('Username: ${account!.username}', style: const TextStyle(fontSize: 18)),
-                      Text('ID: ${account!.id}', style: const TextStyle(fontSize: 18)),
+                      Text('Username: ${account!.username}',
+                          style: const TextStyle(fontSize: 18)),
+                      Text('ID: ${rating!.blitzRating}',
+                          style: const TextStyle(fontSize: 18)),
 
                       // Other UI Elements
                       const SizedBox(height: 20),
                       const Text("Start New Game"),
                       ElevatedButton(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color.fromARGB(255, 9, 219, 44))),
+                            // iconSize: WidgetStatePropertyAll(width),
+                            backgroundColor: WidgetStateProperty.all(
+                                const Color.fromARGB(255, 36, 169, 58))),
                         onPressed: () => {},
                         child: const Text("New Game"),
                       ),
@@ -72,7 +93,7 @@ class _IntialScreenState extends State<IntialScreen> {
                       ElevatedButton(
                         onPressed: () => {},
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 const Color.fromARGB(255, 9, 2, 2))),
                         child: const Text("Play"),
                       ),
@@ -80,7 +101,8 @@ class _IntialScreenState extends State<IntialScreen> {
                       const Text('Stats'),
                     ],
                   )
-                : const Text('Failed to load account details', style: TextStyle(fontSize: 18)),
+                : const Text('Failed to load account details',
+                    style: TextStyle(fontSize: 18)),
       ),
     );
   }

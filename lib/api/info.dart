@@ -15,3 +15,13 @@ Future<Lichess> getAccountDetails() async {
     throw Exception('Failed to get account details');
   }
 }
+
+Future<Lichess> getRatingDetails() async {
+  try {
+    Lichess rating = await ratingDetails(token);
+    return rating;
+  } catch (err) {
+    print('Error Fetching Rating details: $err');
+    throw Exception('Failed to get rating details');
+  }
+}
